@@ -11,7 +11,7 @@ MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX"
 
 # Use a temporary directory to store the downloaded model
 temp_dir = tempfile.gettempdir()
-MODEL_PATH = os.path.join(temp_dir, "downloaded_model.h5")
+MODEL_PATH = os.path.join(temp_dir, "model.h5")
 
 # Download the model if it doesn't exist locally
 if not os.path.exists(MODEL_PATH):
