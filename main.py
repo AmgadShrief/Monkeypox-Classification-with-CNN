@@ -3,8 +3,8 @@ from tensorflow.keras.models import load_model
 import numpy as np
 from PIL import Image
 import os
-import urllib.request
 import tempfile
+import gdown
 
 # URL to the model file on Google Drive
 MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX"
@@ -19,8 +19,12 @@ model = None
 # Download the model if it doesn't exist locally
 if not os.path.exists(MODEL_PATH):
     with st.spinner("Downloading model... This may take a while!"):
-        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
-        st.success("Download completed!")
+        try:
+            # Download using gdown
+            gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
+            st.success("Download completed!")
+        except Exception as e:
+            st.error(f"Error downloading model: {e}")
 
 # Load the trained model
 try:
