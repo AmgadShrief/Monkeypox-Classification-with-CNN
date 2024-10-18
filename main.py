@@ -11,7 +11,10 @@ MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX"
 
 # Use a temporary directory to store the downloaded model
 temp_dir = tempfile.gettempdir()
-MODEL_PATH = os.path.join(temp_dir, "model.h5")
+MODEL_PATH = os.path.join(temp_dir, "downloaded_model.h5")
+
+# Initialize the model variable
+model = None
 
 # Download the model if it doesn't exist locally
 if not os.path.exists(MODEL_PATH):
@@ -24,11 +27,12 @@ try:
     model = load_model(MODEL_PATH)
     st.write("Model loaded successfully.")
 except Exception as e:
-    st.write(f"Error loading model: {e}")
+    st.error(f"Error loading model: {e}")
 
 # Streamlit app code
 st.title("Monkeypox Skin Lesion Detection")
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image.', use_column_width=True)
@@ -39,14 +43,17 @@ if uploaded_file is not None:
     img_array = np.expand_dims(img_array, axis=0)
 
     # Make predictions
-    try:
-        prediction = model.predict(img_array)
-        predicted_class = np.argmax(prediction[0])
+    if model is not None:
+        try:
+            prediction = model.predict(img_array)
+            predicted_class = np.argmax(prediction[0])
 
-        # Display the result
-        if predicted_class == 0:
-            st.write("Prediction: Monkeypox")
-        else:
-            st.write("Prediction: Non-Monkeypox")
-    except Exception as e:
-        st.write(f"Error making prediction: {e}")
+            # Display the result
+            if predicted_class == 0:
+                st.write("Prediction: Monkeypox")
+            else:
+                st.write("Prediction: Non-Monkeypox")
+        except Exception as e:
+            st.error(f"Error making prediction: {e}")
+    else:
+        st.error("Model is not available for making predictions. Please try again later.")
