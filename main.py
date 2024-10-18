@@ -5,8 +5,8 @@ from PIL import Image
 import os
 import urllib.request
 
-# URL to the model file
-MODEL_URL = "https://drive.google.com/file/d/1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX/view?usp=sharing"
+# URL to the model file on Google Drive
+MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzww"
 MODEL_PATH = "model.h5"
 
 # Download the model if it doesn't exist locally
