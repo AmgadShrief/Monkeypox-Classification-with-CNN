@@ -3,8 +3,8 @@ from tensorflow.keras.models import load_model
 import numpy as np
 from PIL import Image
 import os
+import urllib.request
 import tempfile
-import gdown
 
 # URL to the model file on Google Drive
 MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX"
@@ -13,30 +13,22 @@ MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX"
 temp_dir = tempfile.gettempdir()
 MODEL_PATH = os.path.join(temp_dir, "downloaded_model.h5")
 
-# Initialize the model variable
-model = None
-
 # Download the model if it doesn't exist locally
 if not os.path.exists(MODEL_PATH):
     with st.spinner("Downloading model... This may take a while!"):
-        try:
-            # Download using gdown
-            gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
-            st.success("Download completed!")
-        except Exception as e:
-            st.error(f"Error downloading model: {e}")
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+        st.success("Download completed!")
 
 # Load the trained model
 try:
     model = load_model(MODEL_PATH)
     st.write("Model loaded successfully.")
 except Exception as e:
-    st.error(f"Error loading model: {e}")
+    st.write(f"Error loading model: {e}")
 
 # Streamlit app code
 st.title("Monkeypox Skin Lesion Detection")
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
-
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image.', use_column_width=True)
@@ -47,17 +39,14 @@ if uploaded_file is not None:
     img_array = np.expand_dims(img_array, axis=0)
 
     # Make predictions
-    if model is not None:
-        try:
-            prediction = model.predict(img_array)
-            predicted_class = np.argmax(prediction[0])
+    try:
+        prediction = model.predict(img_array)
+        predicted_class = np.argmax(prediction[0])
 
-            # Display the result
-            if predicted_class == 0:
-                st.write("Prediction: Monkeypox")
-            else:
-                st.write("Prediction: Non-Monkeypox")
-        except Exception as e:
-            st.error(f"Error making prediction: {e}")
-    else:
-        st.error("Model is not available for making predictions. Please try again later.")
+        # Display the result
+        if predicted_class == 0:
+            st.write("Prediction: Monkeypox")
+        else:
+            st.write("Prediction: Non-Monkeypox")
+    except Exception as e:
+        st.write(f"Error making prediction: {e}")
