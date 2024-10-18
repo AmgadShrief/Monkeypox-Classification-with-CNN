@@ -50,3 +50,4 @@ if uploaded_file is not None:
             st.write("Prediction: Non-Monkeypox")
     except Exception as e:
         st.write(f"Error making prediction: {e}")
+        
