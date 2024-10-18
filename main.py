@@ -4,10 +4,14 @@ import numpy as np
 from PIL import Image
 import os
 import urllib.request
+import tempfile
 
 # URL to the model file on Google Drive
 MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX"
-MODEL_PATH = "model.h5"
+
+# Use a temporary directory to store the downloaded model
+temp_dir = tempfile.gettempdir()
+MODEL_PATH = os.path.join(temp_dir, "downloaded_model.h5")
 
 # Download the model if it doesn't exist locally
 if not os.path.exists(MODEL_PATH):
@@ -16,7 +20,11 @@ if not os.path.exists(MODEL_PATH):
         st.success("Download completed!")
 
 # Load the trained model
-model = load_model(MODEL_PATH)
+try:
+    model = load_model(MODEL_PATH)
+    st.write("Model loaded successfully.")
+except Exception as e:
+    st.write(f"Error loading model: {e}")
 
 # Streamlit app code
 st.title("Monkeypox Skin Lesion Detection")
@@ -31,11 +39,14 @@ if uploaded_file is not None:
     img_array = np.expand_dims(img_array, axis=0)
 
     # Make predictions
-    prediction = model.predict(img_array)
-    predicted_class = np.argmax(prediction[0])
+    try:
+        prediction = model.predict(img_array)
+        predicted_class = np.argmax(prediction[0])
 
-    # Display the result
-    if predicted_class == 0:
-        st.write("Prediction: Monkeypox")
-    else:
-        st.write("Prediction: Non-Monkeypox")
+        # Display the result
+        if predicted_class == 0:
+            st.write("Prediction: Monkeypox")
+        else:
+            st.write("Prediction: Non-Monkeypox")
+    except Exception as e:
+        st.write(f"Error making prediction: {e}")
