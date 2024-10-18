@@ -6,7 +6,7 @@ import os
 import urllib.request
 
 # URL to the model file on Google Drive
-MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzww"
+MODEL_URL = "https://drive.google.com/uc?id=1rDI2QTo7jyHiw4fX5Ls5TSaBJSwYzwwX"
 MODEL_PATH = "model.h5"
 
 # Download the model if it doesn't exist locally
@@ -18,20 +18,23 @@ if not os.path.exists(MODEL_PATH):
 # Load the trained model
 model = load_model(MODEL_PATH)
 
-# Streamlit app code (rest is the same)
+# Streamlit app code
 st.title("Monkeypox Skin Lesion Detection")
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded Image.', use_column_width=True)
 
+    # Preprocess the image
     img = image.resize((224, 224))  # Resize to model's input size
     img_array = np.array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
+    # Make predictions
     prediction = model.predict(img_array)
     predicted_class = np.argmax(prediction[0])
 
+    # Display the result
     if predicted_class == 0:
         st.write("Prediction: Monkeypox")
     else:
